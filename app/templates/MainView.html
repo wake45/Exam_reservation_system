@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <title>메인화면</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -47,10 +47,9 @@
 </head>
 <body>
 <div class="container">
-    <form action="#" th:action="@{/menu}" method="post">
+    <form action="/menu" method="post">
         <h1>메뉴 선택</h1>
-        <h2><span th:text="${name}"></span> 고객님 반갑습니다!</h2>
-        <input type="hidden" name="id" th:value="${id}"/>
+        <h2><span>{{ name }}</span> 고객님 반갑습니다!</h2>
         <p>
             <button type="button" onclick="submitForm('newReservation')">신규 예약</button>
             <button type="button" onclick="submitForm('viewReservations')">예약 조회</button>

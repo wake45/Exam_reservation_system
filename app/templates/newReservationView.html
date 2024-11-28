@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <title>거래내역 조회</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -79,7 +79,7 @@
 </head>
 <body>
 <div class="container">
-    <form action="#" th:action="@{/reservation}" method="post">
+    <form action="/newReservation" method="post">
         <h1>신규 예약</h1>
         <input type="hidden" name="id" th:value="${id}"/>
 

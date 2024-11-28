@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <title>예약 목록 조회</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -81,25 +81,29 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="resevation : ${resevationList}">
-            <td th:text="${resevation.examName}"></td>
-            <td th:text="${resevation.examStartDate}"></td>
-            <td th:text="${resevation.examEndDate}"></td>
-            <td th:text="${resevation.examParticipants}"></td>
+        {% for reservation in reservationList %}
+        <tr>
+            <td>{{ reservation.examName }}</td>
+            <td>{{ reservation.examStartDate }}</td>
+            <td>{{ reservation.examEndDate }}</td>
+            <td>{{ reservation.examParticipants }}</td>
             <td>
-                <span th:switch="${resevation.resevationType}">
-                    <span th:case="waiting">예약 대기</span>
-                    <span th:case="confirmed">예약 확정</span>
-                    <span th:case="canceled">예약 취소</span>
-                </span>
+                {% if reservation.reservationType == 'waiting' %}
+                    <span>예약 대기</span>
+                {% elif reservation.reservationType == 'confirmed' %}
+                    <span>예약 확정</span>
+                {% elif reservation.reservationType == 'canceled' %}
+                    <span>예약 취소</span>
+                {% endif %}
             </td>
             <td> <!-- 버튼 열 -->
-                <button th:onclick="'editReservation(' + ${resevation.id} + ')'">수정</button>
-                <button th:onclick="'deleteReservation(' + ${resevation.id} + ')'">삭제</button>
-                <button th:onclick="'confirmReservation(' + ${resevation.id} + ')'">확정</button>
-                <button th:onclick="'addReservation(' + ${resevation.id} + ')'">추가</button>
+                <button onclick="editReservation({{ reservation.id }})">수정</button>
+                <button onclick="deleteReservation({{ reservation.id }})">삭제</button>
+                <button onclick="confirmReservation({{ reservation.id }})">확정</button>
+                <button onclick="addReservation({{ reservation.id }})">추가</button>
             </td>
         </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div> <!-- /container -->
