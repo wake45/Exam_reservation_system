@@ -8,3 +8,4 @@
 ### Git Repository 생성
 ### ERD 생성
 ### DB 및 테이블 생성
+### DB 수정 및 VIEW파일 생성

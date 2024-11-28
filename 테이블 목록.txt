@@ -5,26 +5,18 @@ CREATE TABLE Users (
 	modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP		-- 수정일
 );
 
-CREATE TABLE Exams (
-	exam_id SERIAL PRIMARY KEY,						-- 시험 ID
-	exam_name VARCHAR(100) NOT NULL,					-- 시험명
-	exam_date TIMESTAMP NOT NULL,						-- 시험 시작 시간
-	max_participants INTEGER NOT NULL,					-- 최대 시험 응시 인원 수
-	current_participants INTEGER NOT NULL,					-- 현재 시험 응시 인원 수
-	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 		-- 생성일
-	modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP		-- 수정일
-);
-
 CREATE TYPE reservation_status AS ENUM ('waiting', 'confirmed', 'canceled');
 
 CREATE TABLE Reservations (
-	reservation_id SERIAL PRIMARY KEY,							-- 예약 ID
-	reservation_type reservation_status NOT NULL,                       			-- 예약 상태 (ENUM 타입 사용 / waiting:예약대기 , confirmed:예약확정, canceled:예약취소)
-	user_id INTEGER NOT NULL,									-- 사용자ID(Users)
-	exam_id INTEGER NOT NULL,									-- 시험ID(Exams)
-	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,				-- 생성일
-	modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,			-- 수정일
-	FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,	-- 외래키 설정
-	FOREIGN KEY (exam_id) REFERENCES Exams(exam_id) ON DELETE CASCADE,  	-- 외래키 설정
-	UNIQUE(user_id, exam_id)									-- 예약 중복 방지
-)
+    reservation_id SERIAL PRIMARY KEY,                            		-- 예약 ID
+    reservation_type reservation_status NOT NULL,                		-- 예약 상태 (ENUM 타입 사용)
+    exam_name VARCHAR(100) NOT NULL,                             		-- 시험명
+    exam_start_date TIMESTAMP NOT NULL,                          		-- 시험 시작 시간
+    exam_end_date TIMESTAMP NOT NULL,                            		-- 시험 종료 시간 (변경)
+    exam_participants INTEGER NOT NULL,                          		-- 시험 응시 인원 수
+    user_id INTEGER NOT NULL,                                    			-- 사용자ID (Users)
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,           	-- 예약 생성일
+    modified_date TIMESTAMP,                                     			-- 예약 수정일
+    canceled_date TIMESTAMP,                                     			-- 예약 취소일
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE  -- 외래키 설정
+);
