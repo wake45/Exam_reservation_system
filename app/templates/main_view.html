@@ -47,30 +47,43 @@
 </head>
 <body>
 <div class="container">
-    <form action="/menu" method="post">
+    <form method="get">
+        <input type="hidden" name="id" value="{{ id }}"/>
         <h1>메뉴 선택</h1>
         <h2><span>{{ name }}</span> 고객님 반갑습니다!</h2>
         <p>
-            <button type="button" onclick="submitForm('newReservation')">신규 예약</button>
-            <button type="button" onclick="submitForm('viewReservations')">예약 조회</button>
+            <button type="button" id="new-reservation" onclick="submitForm('reservation_new')">신규 예약</button>
+            <button type="button" onclick="submitForm('reservation_list')">예약 조회</button>
         </p>
+        <button type="button" onclick="submitForm('test_data')">테스트 데이터 생성</button>
     </form>
 </div> <!-- /container -->
 <script>
     function submitForm(action) {
         const form = document.querySelector('form');
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'action';
-        input.value = action;
-        form.appendChild(input);
-        if (action === 'newReservation') {
-            form.action = '/newReservationMenu';
-        } else if (action === 'viewReservations') {
-            form.action = '/viewReservationsMenu';
+
+        // 기존 action 입력 필드가 있는지 확인하고 제거
+        const existingInput = form.querySelector('input[name="action"]');
+        if (existingInput) {
+            existingInput.value = action;  // 기존 입력 필드의 값을 업데이트
+        } else {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'action';
+            input.value = action;
+            form.appendChild(input);
         }
+
+        form.action = "/" + action;
         form.submit();
     }
+
+    window.onload = function() {
+        const userId = parseInt("{{ id }}", 10); // 서버에서 전달된 id 값을 정수로 변환
+        if (userId === 999) {
+            document.getElementById('new-reservation').style.display = 'none'; // 신규 예약 버튼 숨김
+        }
+    };
 </script>
 </body>
 </html>

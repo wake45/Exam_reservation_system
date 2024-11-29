@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테스트 데이터 결과</title>
+</head>
+<body>
+    <h1>테스트 데이터 생성 결과</h1>
+    <ul>
+        {% for result in results %}
+            <li>{{ result.message if result.message else result.error }} ( {{ result.user_name }} ) </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

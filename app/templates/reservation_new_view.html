@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html lang="en">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <head>
     <title>거래내역 조회</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -42,9 +43,6 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        input[type="radio"] {
-            margin-right: 10px;
-        }
         button {
             background-color: springgreen;
             color: white;
@@ -61,58 +59,61 @@
         button:hover {
             background-color: #45a049;
         }
-        .date-range {
-            display: flex;
-            align-items: center; /* 수직 정렬을 중앙으로 */
-            margin: 15px 0; /* 위아래 여백 추가 */
-        }
-
-        .date-range label {
-            margin-right: 10px; /* 레이블과 입력 필드 간 간격 */
-        }
-
-        .date-range input {
-            margin-right: 10px; /* 입력 필드 간 간격 */
-        }
-
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <div class="container">
-    <form action="/newReservation" method="post">
+    <form id="reservation-form">
         <h1>신규 예약</h1>
-        <input type="hidden" name="id" th:value="${id}"/>
+        <input type="hidden" name="user_id" value="{{ id }}"/>
 
         <div>
-            <label for="accountNumber">시험명</label>
-        </div>
-        <div class="date-range">
-            <input type="text" id="examName" name="examName" placeholder="시험명" required>
-        </div>
-
-        <div>
-            <label for="inquiryStartDate">시험시작일자</label>
-        </div>
-        <div class="date-range">
-            <input type="text" id="examStartDate" name="examStartDate" placeholder="시험 시작 날짜" required>
+            <label for="exam_name">시험명</label>
+            <input type="text" id="exam_name" name="exam_name" placeholder="시험명" required>
         </div>
 
         <div>
-            <label for="inquiryStartDate">시험종료일자</label>
-        </div>
-        <div class="date-range">
-            <input type="text" id="examEndDate" name="examEndDate" placeholder="시험 종료 날짜" required>
+            <label for="exam_start_date">시험시작일자</label>
+            <input type="text" id="exam_start_date" name="exam_start_date" placeholder="ex) 20241129 150000" required>
         </div>
 
         <div>
-            <label>응시인원</label>
+            <label for="exam_end_date">시험종료일자</label>
+            <input type="text" id="exam_end_date" name="exam_end_date" placeholder="ex) 20241129 170000" required>
         </div>
-        <div class="date-range">
-            <input type="text" id="examParticipants" name="examParticipants" placeholder="응시 인원" required>
+
+        <div>
+            <label for="exam_participants">응시인원</label>
+            <input type="text" id="exam_participants" name="exam_participants" placeholder="응시 인원 (5만명 이하)" required>
         </div>
 
         <button type="submit">예약하기</button>
     </form>
 </div> <!-- /container -->
+
+<script>
+    $(document).ready(function() {
+        $('#reservation-form').on('submit', function(event) {
+            event.preventDefault();  // 기본 제출 동작 방지
+
+            const formData = $(this).serialize();  // 폼 데이터 직렬화
+
+            $.post('/reservation', formData)
+                .done(function(response) {
+                    if (response.error) {
+                        alert(response.error);  // error 메시지를 alert로 표시
+                    } else {
+                        alert(response.message);  // 성공 메시지를 alert로 표시
+                    }
+                })
+                .fail(function(xhr) {
+                    // 오류 메시지 팝업
+                    const errorResponse = xhr.responseJSON;
+                    alert(errorResponse.error || "예약 등록 중 오류가 발생했습니다.");
+                });
+        });
+    });
+</script>
 </body>
 </html>

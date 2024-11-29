@@ -68,7 +68,7 @@
 <body>
 <div class="container">
     <h1>예약 내역 목록</h1>
-
+    <input type="hidden" name="user_id" value="{{ id }}"/>
     <table>
         <thead>
         <tr>
@@ -83,24 +83,24 @@
         <tbody>
         {% for reservation in reservationList %}
         <tr>
-            <td>{{ reservation.examName }}</td>
-            <td>{{ reservation.examStartDate }}</td>
-            <td>{{ reservation.examEndDate }}</td>
-            <td>{{ reservation.examParticipants }}</td>
+            <td>{{ reservation.exam_name }}</td>
+            <td>{{ reservation.exam_start_date }}</td>
+            <td>{{ reservation.exam_end_date }}</td>
+            <td>{{ reservation.exam_participants }}</td>
             <td>
-                {% if reservation.reservationType == 'waiting' %}
+                {% if reservation.reservation_type == 'WAITING' %}
                     <span>예약 대기</span>
-                {% elif reservation.reservationType == 'confirmed' %}
+                {% elif reservation.reservation_type == 'CONFIRMED' %}
                     <span>예약 확정</span>
-                {% elif reservation.reservationType == 'canceled' %}
+                {% elif reservation.reservation_type == 'CANCELED' %}
                     <span>예약 취소</span>
                 {% endif %}
             </td>
             <td> <!-- 버튼 열 -->
-                <button onclick="editReservation({{ reservation.id }})">수정</button>
-                <button onclick="deleteReservation({{ reservation.id }})">삭제</button>
-                <button onclick="confirmReservation({{ reservation.id }})">확정</button>
-                <button onclick="addReservation({{ reservation.id }})">추가</button>
+                <button onclick="editReservation('{{ id }}')">수정</button>
+                <button onclick="deleteReservation('{{ id }}')">삭제</button>
+                <button onclick="confirmReservation('{{ id }}')">확정</button>
+                <button onclick="addReservation('{{ id }}')">추가</button>
             </td>
         </tr>
         {% endfor %}
