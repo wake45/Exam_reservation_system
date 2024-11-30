@@ -20,7 +20,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: left;
-            width: 400px;
+            width: 600px;  /* 너비 증가 */
         }
         h1 {
             color: #333;
@@ -59,6 +59,22 @@
         button:hover {
             background-color: #45a049;
         }
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .error {
+            color: red;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -90,6 +106,27 @@
 
         <button type="submit">예약하기</button>
     </form>
+
+    <!-- 예약 목록 테이블 -->
+    <h2>예약 목록</h2>
+    <table id="reservation-table">
+        <thead>
+            <tr>
+                <th>시험 시작 시간</th>
+                <th>시험 종료 시간</th>
+                <th>응시 인원</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.exam_start_date }}</td>
+                <td>{{ reservation.exam_end_date }}</td>
+                <td>{{ reservation.exam_participants }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div> <!-- /container -->
 
 <script>
@@ -105,6 +142,7 @@
                         alert(response.error);  // error 메시지를 alert로 표시
                     } else {
                         alert(response.message);  // 성공 메시지를 alert로 표시
+                        location.reload();  // 페이지 새로고침
                     }
                 })
                 .fail(function(xhr) {

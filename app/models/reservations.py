@@ -1,9 +1,8 @@
 from sqlalchemy import Enum, ForeignKey, Column, Integer, String, DateTime
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import relationship
 from datetime import datetime
-from enum import Enum as PyEnum
 
-from database import Base  # SQLAlchemy Base 클래스를 가져옵니다.
+from database import Base
 from enums.reservation_status import ReservationStatus
 
 class Reservations(Base):
@@ -24,26 +23,3 @@ class Reservations(Base):
 
     # ForeignKey 관계 정의
     user = relationship("Users", back_populates="reservations")  # User 모델과의 관계
-    
-    def insert_reservation(
-        db: Session,
-        exam_name: str,
-        exam_start_date: datetime,  # 적절한 데이터 타입으로 변경
-        exam_end_date: datetime,    # 적절한 데이터 타입으로 변경
-        exam_participants: int, # 또는 List 등 필요한 데이터 타입으로 변경
-        user_id: int           # 또는 str 등 필요한 데이터 타입으로 변경
-    ):
-        new_reservation = Reservations(
-            reservation_type=ReservationStatus.WAITING,
-            exam_name=exam_name,
-            exam_start_date=exam_start_date,
-            exam_end_date=exam_end_date,
-            exam_participants=exam_participants,
-            user_id=user_id
-        )
-        
-        db.add(new_reservation)  # 새로운 예약 객체를 세션에 추가합니다.
-        db.commit()  # 데이터베이스에 커밋하여 변경사항을 저장합니다.
-        db.refresh(new_reservation)  # 데이터베이스에서 새로 추가된 객체를 새로고침합니다.
-        
-        return new_reservation  # 추가된 예약 객체를 반환합니다.

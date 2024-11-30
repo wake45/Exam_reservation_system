@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <html lang="en">
 <head>
     <title>예약 목록 조회</title>
@@ -63,6 +64,39 @@
             justify-content: center;
             margin-top: 20px;
         }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            padding-top: 60px; 
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+            border-radius: 8px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -72,6 +106,7 @@
     <table>
         <thead>
         <tr>
+            <th>시험ID</th>
             <th>시험명</th>
             <th>시험시작시간</th>
             <th>시험종료시간</th>
@@ -83,6 +118,7 @@
         <tbody>
         {% for reservation in reservationList %}
         <tr>
+            <td>{{ reservation.id }}</td>
             <td>{{ reservation.exam_name }}</td>
             <td>{{ reservation.exam_start_date }}</td>
             <td>{{ reservation.exam_end_date }}</td>
@@ -96,16 +132,224 @@
                     <span>예약 취소</span>
                 {% endif %}
             </td>
-            <td> <!-- 버튼 열 -->
-                <button onclick="editReservation('{{ id }}')">수정</button>
-                <button onclick="deleteReservation('{{ id }}')">삭제</button>
-                <button onclick="confirmReservation('{{ id }}')">확정</button>
-                <button onclick="addReservation('{{ id }}')">추가</button>
+            <td>
+                {% if id == 999 %} <!-- 관리자 -->
+                    {% if reservation.reservation_type == 'WAITING' %}
+                        <button onclick="openModifyModal('{{ reservation.id }}','{{ reservation.exam_name }}', '{{ reservation.exam_start_date }}'.replace(/[-:]/g, ''), '{{ reservation.exam_end_date }}'.replace(/[-:]/g, ''), '{{ reservation.exam_participants }}')">수정</button>
+                        <button onclick="reservationDelete('{{ reservation.id }}')">삭제</button>
+                        <button onclick="reservationConfirm('{{ reservation.id }}')">확정</button>
+                    {% elif reservation.reservation_type == 'CONFIRMED' %}
+                        {% if reservation.exam_participants <= 50000 %}
+                            <button onclick="openModifyModal('{{ reservation.id }}','{{ reservation.exam_name }}', '{{ reservation.exam_start_date }}'.replace(/[-:]/g, ''), '{{ reservation.exam_end_date }}'.replace(/[-:]/g, ''), '{{ reservation.exam_participants }}')">수정</button>
+                            <button onclick="reservationDelete('{{ reservation.id }}')">삭제</button>
+                            <button onclick="openAddModal('{{ reservation.id }}','{{ reservation.exam_participants }}')">추가</button>
+                        {% endif %}
+                    {% elif reservation.reservation_type == 'CANCELED' %}
+                        <!-- 버튼 미노출 -->
+                    {% endif %}
+                {% else %} <!-- 고객 -->
+                    {% if reservation.reservation_type == 'WAITING' %}
+                        <button onclick="openModifyModal('{{ reservation.id }}','{{ reservation.exam_name }}', '{{ reservation.exam_start_date }}'.replace(/[-:]/g, ''), '{{ reservation.exam_end_date }}'.replace(/[-:]/g, ''), '{{ reservation.exam_participants }}')">수정</button>
+                        <button onclick="reservationDelete('{{ reservation.id }}')">삭제</button>
+                    {% elif reservation.reservation_type == 'CONFIRMED' %}
+                        {% if reservation.exam_participants <= 50000 %}
+                            <button onclick="openAddModal('{{ reservation.id }}','{{ reservation.exam_participants }}')">추가</button>
+                        {% endif %}
+                    {% elif reservation.reservation_type == 'CANCELED' %}
+                        <!-- 버튼 미노출 -->
+                    {% endif %}
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
 </div> <!-- /container -->
+
+<!-- 수정 팝업 -->
+<div id="modifyModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModifyModal()">&times;</span>
+        <h2>예약 수정</h2>
+        <label>시험ID:</label>
+        <input type="text" id="modifyId" /><br/>
+        <label>시험명:</label>
+        <input type="text" id="modifyExamName" /><br/>
+        <label>시험 시작 시간:</label>
+        <input type="text" id="modifyExamStartDate" /><br/>
+        <label>시험 종료 시간:</label>
+        <input type="text" id="modifyExamEndDate" /><br/>
+        <label>응시 인원:</label>
+        <input type="text" id="modifyExamParticipants" /><br/>
+        <button onclick="reservationModify()">수정 완료</button>
+    </div>
+</div>
+
+<!-- 추가 팝업 -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddModal()">&times;</span>
+        <h2>응시 인원 추가</h2>
+        <label>시험ID:</label>
+        <input type="text" id="addId" /><br/>
+        <p>현재 응시 인원: <span id="currentParticipants"></span></p>
+        <p>최대 추가 가능 인원: <span id="maxAddable"></span></p>
+        <label>추가 응시 인원:</label>
+        <input type="text" id="addExamParticipants" min="1" />
+        <button onclick="reservationAdd()">추가 완료</button>
+    </div>
+</div>
+
+<script>
+    function openModifyModal(id, examName, startDate, endDate, participants) {
+        document.getElementById('modifyId').value = id;
+        document.getElementById('modifyExamName').value = examName;
+        document.getElementById('modifyExamStartDate').value = startDate;
+        document.getElementById('modifyExamEndDate').value = endDate;
+        document.getElementById('modifyExamParticipants').value = participants;
+        document.getElementById('modifyModal').style.display = "block";
+    }
+
+    function closeModifyModal() {
+        document.getElementById('modifyModal').style.display = "none";
+    }
+
+    function reservationModify() {
+        const id = document.getElementById('modifyId').value;
+        const examName = document.getElementById('modifyExamName').value;
+        const examStartDate = document.getElementById('modifyExamStartDate').value;
+        const examEndDate = document.getElementById('modifyExamEndDate').value;
+        const examParticipants = document.getElementById('modifyExamParticipants').value;
+
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('exam_name', examName);
+        formData.append('exam_start_date', examStartDate);
+        formData.append('exam_end_date', examEndDate);
+        formData.append('exam_participants', examParticipants);
+
+        $.ajax({
+            url: '/reservation_modify',
+            type: 'POST',
+            data: formData,
+            processData: false,  // jQuery가 데이터를 처리하지 않도록 설정
+            contentType: false,  // jQuery가 Content-Type을 설정하지 않도록 설정
+            success: function(response) {
+                if (response.error) {
+                    alert(response.error);  // error 메시지를 alert로 표시
+                } else {
+                    alert(response.message);  // 성공 메시지를 alert로 표시
+                    location.reload();  // 페이지 새로고침
+                }
+            },
+            error: function(xhr) {
+                alert("수정 중 오류가 발생했습니다.");
+                console.error('Error:', xhr);
+            }
+        });
+
+        closeModifyModal();
+    }
+
+    function openAddModal(id, currentParticipants) {
+        document.getElementById('addId').value = id;
+        document.getElementById('currentParticipants').innerText = currentParticipants;
+        document.getElementById('maxAddable').innerText = 50000 - currentParticipants;
+        document.getElementById('addModal').style.display = "block";
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = "none";
+    }
+
+    function reservationAdd() {
+        const id = document.getElementById('addId').value;
+        const addExamParticipants = document.getElementById('addExamParticipants').value;
+
+        const formData = new FormData();
+        formData.append('id', id);
+        formData.append('add_exam_participants', addExamParticipants);
+
+        $.ajax({
+            url: '/reservation_add',
+            type: 'POST',
+            data: formData,
+            processData: false,  // jQuery가 데이터를 처리하지 않도록 설정
+            contentType: false,  // jQuery가 Content-Type을 설정하지 않도록 설정
+            success: function(response) {
+                if (response.error) {
+                    alert(response.error);  // error 메시지를 alert로 표시
+                } else {
+                    alert(response.message);  // 성공 메시지를 alert로 표시
+                    location.reload();  // 페이지 새로고침
+                }
+            },
+            error: function(xhr) {
+                alert("예약 인원 추가 중 오류가 발생했습니다.");
+                console.error('Error:', xhr);
+            }
+        });
+
+        closeAddModal();
+    }
+
+    function reservationDelete(id) {
+        const formData = new FormData();
+        formData.append('id', id);
+
+        $.ajax({
+            url: '/reservation_delete',
+            type: 'POST',
+            data: formData,
+            processData: false,  // jQuery가 데이터를 처리하지 않도록 설정
+            contentType: false,  // jQuery가 Content-Type을 설정하지 않도록 설정
+            success: function(response) {
+                if (response.error) {
+                    alert(response.error);  // error 메시지를 alert로 표시
+                } else {
+                    alert(response.message);  // 성공 메시지를 alert로 표시
+                    location.reload();  // 페이지 새로고침
+                }
+            },
+            error: function(xhr) {
+                alert("예약 삭제 중 오류가 발생했습니다.");
+                console.error('Error:', xhr);
+            }
+        });
+    }
+
+    function reservationConfirm(id) {
+        const formData = new FormData();
+        formData.append('id', id);
+
+        $.ajax({
+            url: '/reservation_confirm',
+            type: 'POST',
+            data: formData,
+            processData: false,  // jQuery가 데이터를 처리하지 않도록 설정
+            contentType: false,  // jQuery가 Content-Type을 설정하지 않도록 설정
+            success: function(response) {
+                if (response.error) {
+                    alert(response.error);  // error 메시지를 alert로 표시
+                } else {
+                    alert(response.message);  // 성공 메시지를 alert로 표시
+                    location.reload();  // 페이지 새로고침
+                }
+            },
+            error: function(xhr) {
+                alert("예약 확정 중 오류가 발생했습니다.");
+                console.error('Error:', xhr);
+            }
+        });
+    }
+
+    window.onclick = function(event) {
+        if (event.target.className === 'modal') {
+            closeModifyModal();
+            closeAddModal();
+        }
+    }
+</script>
+
 </body>
 </html>
