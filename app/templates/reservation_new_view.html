@@ -1,9 +1,10 @@
 <!DOCTYPE HTML>
-<html lang="en">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<html lang="ko">
 <head>
-    <title>거래내역 조회</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신규 예약</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,9 +19,8 @@
             background-color: white;
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            width: 600px;  /* 너비 증가 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 600px;
         }
         h1 {
             color: #333;
@@ -52,16 +52,20 @@
             cursor: pointer;
             font-size: 18px;
             margin-top: 20px;
-            display: block;
             width: 100%;
             transition: background-color 0.3s;
         }
         button:hover {
             background-color: #45a049;
         }
+        h2 {
+            margin-top: 30px;
+            text-align: center;
+            color: #333;
+        }
         table {
             width: 100%;
-            margin-top: 30px;
+            margin-top: 10px;
             border-collapse: collapse;
         }
         th, td {
@@ -76,82 +80,80 @@
             color: red;
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<div class="container">
-    <form id="reservation-form">
-        <h1>신규 예약</h1>
-        <input type="hidden" name="user_id" value="{{ id }}"/>
+    <div class="container">
+        <form id="reservation-form">
+            <h1>신규 예약</h1>
+            <input type="hidden" name="user_id" value="{{ id }}"/>
 
-        <div>
-            <label for="exam_name">시험명</label>
-            <input type="text" id="exam_name" name="exam_name" placeholder="시험명" required>
-        </div>
+            <div>
+                <label for="exam_name">시험명</label>
+                <input type="text" id="exam_name" name="exam_name" placeholder="시험명" required>
+            </div>
 
-        <div>
-            <label for="exam_start_date">시험시작일자</label>
-            <input type="text" id="exam_start_date" name="exam_start_date" placeholder="ex) 20241129 150000" required>
-        </div>
+            <div>
+                <label for="exam_start_date">시험 시작일자</label>
+                <input type="text" id="exam_start_date" name="exam_start_date" placeholder="ex) 20241129 150000" required>
+            </div>
 
-        <div>
-            <label for="exam_end_date">시험종료일자</label>
-            <input type="text" id="exam_end_date" name="exam_end_date" placeholder="ex) 20241129 170000" required>
-        </div>
+            <div>
+                <label for="exam_end_date">시험 종료일자</label>
+                <input type="text" id="exam_end_date" name="exam_end_date" placeholder="ex) 20241129 170000" required>
+            </div>
 
-        <div>
-            <label for="exam_participants">응시인원</label>
-            <input type="text" id="exam_participants" name="exam_participants" placeholder="응시 인원 (5만명 이하)" required>
-        </div>
+            <div>
+                <label for="exam_participants">응시 인원</label>
+                <input type="text" id="exam_participants" name="exam_participants" placeholder="응시 인원 (5만명 이하)" required>
+            </div>
 
-        <button type="submit">예약하기</button>
-    </form>
+            <button type="submit">예약하기</button>
+        </form>
 
-    <!-- 예약 목록 테이블 -->
-    <h2>예약 목록</h2>
-    <table id="reservation-table">
-        <thead>
-            <tr>
-                <th>시험 시작 시간</th>
-                <th>시험 종료 시간</th>
-                <th>응시 인원</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reservation in reservations %}
-            <tr>
-                <td>{{ reservation.exam_start_date }}</td>
-                <td>{{ reservation.exam_end_date }}</td>
-                <td>{{ reservation.exam_participants }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div> <!-- /container -->
+        <h2>예약 목록</h2>
+        <table id="reservation-table">
+            <thead>
+                <tr>
+                    <th>시험 시작 시간</th>
+                    <th>시험 종료 시간</th>
+                    <th>응시 인원</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                <tr>
+                    <td>{{ reservation.exam_start_date }}</td>
+                    <td>{{ reservation.exam_end_date }}</td>
+                    <td>{{ reservation.exam_participants }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div> <!-- /container -->
 
-<script>
-    $(document).ready(function() {
-        $('#reservation-form').on('submit', function(event) {
-            event.preventDefault();  // 기본 제출 동작 방지
+    <script>
+        $(document).ready(function() {
+            $('#reservation-form').on('submit', function(event) {
+                event.preventDefault();  // 기본 제출 동작 방지
 
-            const formData = $(this).serialize();  // 폼 데이터 직렬화
+                const formData = $(this).serialize();  // 폼 데이터 직렬화
 
-            $.post('/reservation', formData)
-                .done(function(response) {
-                    if (response.error) {
-                        alert(response.error);  // error 메시지를 alert로 표시
-                    } else {
-                        alert(response.message);  // 성공 메시지를 alert로 표시
-                        location.reload();  // 페이지 새로고침
-                    }
-                })
-                .fail(function(xhr) {
-                    // 오류 메시지 팝업
-                    const errorResponse = xhr.responseJSON;
-                    alert(errorResponse.error || "예약 등록 중 오류가 발생했습니다.");
-                });
+                $.post('/reservation', formData)
+                    .done(function(response) {
+                        if (response.error) {
+                            alert(response.error);  // error 메시지를 alert로 표시
+                        } else {
+                            alert(response.message);  // 성공 메시지를 alert로 표시
+                            location.reload();  // 페이지 새로고침
+                        }
+                    })
+                    .fail(function(xhr) {
+                        // 오류 메시지 팝업
+                        const errorResponse = xhr.responseJSON;
+                        alert(errorResponse.error || "예약 등록 중 오류가 발생했습니다.");
+                    });
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

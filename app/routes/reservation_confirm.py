@@ -14,8 +14,6 @@ async def reservation_confirm(
     db: Session = Depends(get_db)
 ):
 
-    print(id)
-
     # 서비스 호출
     reservation_confirm_service = ReservationConfirmService(db)  # DB 세션을 전달하여 서비스 인스턴스 생성
     result = reservation_confirm_service.confirm_reservation(id)

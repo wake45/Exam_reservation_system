@@ -11,8 +11,6 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/reservation_list") # 예약 목록 조회 페이지로 이동
 async def reservation_list(request: Request, id: int, db: Session = Depends(get_db)):
 
-    print(id)
-
     # 서비스 호출
     reservation_list_service = ReservationListService(db)  # DB 세션을 전달하여 서비스 인스턴스 생성
     reservationListResult = reservation_list_service.select_reservationList(id)

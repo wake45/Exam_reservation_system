@@ -6,16 +6,18 @@ from models.reservations import Reservations
 
 class ReservationListService:
     def __init__(self, db: Session):
-        self.db = db  # 데이터베이스 세션 저장
+        self.db = db
 
     def select_reservationList(self, user_id: int):
+
+        # 관리자일 경우 전체 조회 아닐 경우 해당 사용자 ID 기준 조회
         if user_id != 999 :
             query = self.db.query(Reservations).filter(Reservations.user_id == user_id)
         else :
             query = self.db.query(Reservations)
         
         # 쿼리 실행 및 결과 가져오기
-        results = query.all()  # 쿼리 결과를 한 번만 호출
+        results = query.order_by(Reservations.exam_start_date).all()  # 쿼리 결과를 한 번만 호출
         
         # 데이터 정제
         for reservation in results:

@@ -8,7 +8,7 @@ from database import get_db
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/reservation_new") # 신규예약 페이지로 이동
+@router.get("/reservation_new") # 신규예약 페이지로 이동(현재 예약되어있는 예약 리스트 노출)
 async def reservation_new(request: Request, id: int, db: Session = Depends(get_db)):
 
     # 서비스 호출

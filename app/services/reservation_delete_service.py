@@ -12,17 +12,20 @@ class ReservationDeleteService:
     def delete_reservation(self,
         id: int
     ):
+        
+        # 예약 ID 기준 조회
         existing_reservation = self.db.query(Reservations).filter(Reservations.id == id).first()
 
+        # 예약이 존재하지 않을 경우
         if not existing_reservation:
             return {"error": "예약을 찾을 수 없습니다."}
 
         # 예약 삭제
         try:
             existing_reservation.reservation_type = ReservationStatus.CANCELED
-            existing_reservation.canceled_date = datetime.now()
+            existing_reservation.canceled_date = datetime.now() # 삭제 시간 설정
 
-            self.db.commit()  # 데이터베이스에 커밋
+            self.db.commit()  # 변경사항 저장
 
             return {"message": "예약이 성공적으로 삭제되었습니다."}
         except Exception as e:

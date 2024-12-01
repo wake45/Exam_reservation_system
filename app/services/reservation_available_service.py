@@ -10,21 +10,23 @@ class ReservationAvailableService:
         self.db = db  # 데이터베이스 세션 저장
 
     def select_available_reservation(self):
+        
         # 오늘 날짜 기준으로 6일 전과 3일 전 계산
         today = datetime.now()
         six_days_ahead = today + timedelta(days=6)
         three_days_ahead = today + timedelta(days=3)
 
+        # 오늘 날짜 기준으로 6일전 부터 3일전 확정된 데이터만 조회
         query = self.db.query(Reservations).filter(
             Reservations.reservation_type == ReservationStatus.CONFIRMED,
             and_(
-                Reservations.exam_start_date >= three_days_ahead,  # 3일 전 (12월 3일)부터
-                Reservations.exam_start_date <= six_days_ahead      # 6일 전 (12월 6일)까지
+                Reservations.exam_start_date >= three_days_ahead,
+                Reservations.exam_start_date <= six_days_ahead
             )
         )
 
         # 쿼리 실행 및 결과 가져오기
-        results = query.all()  # 쿼리 결과를 한 번만 호출
+        results = query.order_by(Reservations.exam_start_date).all()
 
         # 데이터 정제
         for reservation in results:

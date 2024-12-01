@@ -8,14 +8,14 @@ from database import get_db
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/test_data") # 예약 목록 조회 페이지로 이동
+@router.get("/test_data") # 테스트 데이터 생성(Users)
 async def test_data(request: Request, db: Session = Depends(get_db)):
     test_data_service = TestDataService(db)
 
     test_data_results = [
-        test_data_service.create_test_data('그렙'),
-        test_data_service.create_test_data('테슬라'),
-        test_data_service.create_test_data('애플'),
+        test_data_service.create_test_data('그렙'), # '001'
+        test_data_service.create_test_data('테슬라'), # '002'
+        test_data_service.create_test_data('애플'), # '003'
     ]
 
     # 결과 메시지를 포함한 응답 반환

@@ -23,7 +23,7 @@ def create_tables():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-# FastAPI 애플리케이션이 시작될 때 테이블 생성
+# 애플리케이션이 시작될 때 테이블 생성
 @app.on_event("startup")
 async def startup_event():
     create_tables()

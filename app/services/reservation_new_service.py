@@ -37,8 +37,8 @@ class ReservationNewService:
             Reservations.exam_participants
         ).filter(
             and_(
-                Reservations.exam_start_date < exam_end_date,
-                Reservations.exam_end_date > exam_start_date,
+                Reservations.exam_start_date <= exam_end_date,
+                Reservations.exam_end_date >= exam_start_date,
                 Reservations.reservation_type == ReservationStatus.CONFIRMED
             )
         ).all()
@@ -46,26 +46,31 @@ class ReservationNewService:
         # 총 응시 인원 계산
         total_participants = sum(reservation.exam_participants for reservation in overlapping_participants)
 
-        # 기존 예약의 응시 인원도 포함
-        total_participants += exam_participants
+        # 확정된 응시 인원이 5만 명 이상인지 확인
+        if total_participants >= 50000:
+            return {"error": "해당 시간대에 확정된 응시 인원이 5만 명을 초과하였습니다."}
 
-        # 응시 인원이 5만 명 초과하는지 확인
-        if total_participants > 50000:
-            return {"error": "해당 시간대에 응시 인원이 5만 명을 초과하였습니다."}
+        # 기존 예약의 응시 인원도 포함
+        total_participants_add = total_participants + exam_participants
+
+        # 신규 예약 응시 인원을 포함한 응시 인원이 5만 명 초과하는지 확인
+        if total_participants_add > 50000:
+            return {"error": "해당 시간대에는 " + str(50000 - total_participants) + "명만 예약 가능합니다."}
+
+        # 예약 객체 생성
+        new_reservation = Reservations(
+            reservation_type=ReservationStatus.WAITING,
+            exam_name=exam_name,
+            exam_start_date=exam_start_date,
+            exam_end_date=exam_end_date,
+            exam_participants=exam_participants,
+            user_id=user_id
+        )
 
         # 예약 추가
         try:
-            new_reservation = Reservations(
-                reservation_type=ReservationStatus.WAITING,
-                exam_name=exam_name,
-                exam_start_date=exam_start_date,
-                exam_end_date=exam_end_date,
-                exam_participants=exam_participants,
-                user_id=user_id
-            )
-            
-            self.db.add(new_reservation)  # 새로운 예약 객체를 세션에 추가합니다.
-            self.db.commit()  # 데이터베이스에 커밋하여 변경사항을 저장합니다.
+            self.db.add(new_reservation)  # 새로운 예약 객체를 세션에 추가
+            self.db.commit()  # 변경사항 저장
 
             return {"message": "예약이 성공적으로 등록되었습니다."}
         except Exception as e:

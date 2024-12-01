@@ -1,8 +1,9 @@
 <!DOCTYPE HTML>
-<html lang="en">
+<html lang="ko">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인화면</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,75 +16,84 @@
         }
         .container {
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             text-align: center;
+            width: 350px;
         }
         h1 {
             color: #333;
+            margin-bottom: 10px;
+            font-size: 28px; /* 크기 조정 */
         }
         h2 {
             color: springgreen;
+            margin-bottom: 20px;
+            font-size: 20px; /* 크기 조정 */
         }
         p {
-            margin: 20px 0;
+            margin: 15px 0;
         }
         button {
             background-color: springgreen;
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 10px 20px;
+            padding: 12px 20px;
             cursor: pointer;
             font-size: 16px;
-            margin: 0 10px;
-            transition: background-color 0.3s;
+            margin: 5px; /* 버튼 간격 조정 */
+            transition: background-color 0.3s, transform 0.2s;
         }
         button:hover {
             background-color: #45a049;
+            transform: translateY(-2px); /* 버튼 애니메이션 효과 */
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <form method="get">
-        <input type="hidden" name="id" value="{{ id }}"/>
-        <h1>메뉴 선택</h1>
-        <h2><span>{{ name }}</span> 고객님 반갑습니다!</h2>
-        <p>
-            <button type="button" id="new-reservation" onclick="submitForm('reservation_new')">신규 예약</button>
-            <button type="button" onclick="submitForm('reservation_list')">예약 조회</button>
-        </p>
-        <button type="button" onclick="submitForm('test_data')">테스트 데이터 생성</button>
-    </form>
-</div> <!-- /container -->
-<script>
-    function submitForm(action) {
-        const form = document.querySelector('form');
+    <div class="container">
+        <form method="get">
+            <input type="hidden" name="id" value="{{ id }}"/>
+            <h1>메뉴 선택</h1>
+            <h2><span>{{ name }}</span> 고객님 반갑습니다!</h2>
+            <p>
+                <button type="button" id="new-reservation" onclick="submitForm('reservation_new')">신규 예약</button>
+                <button type="button" onclick="submitForm('reservation_list')">예약 조회</button>
+            </p>
+            <p>
+                <button type="button" onclick="submitForm('test_data')">테스트 데이터 생성</button>
+            </p>
+        </form>
+    </div> <!-- /container -->
+    
+    <script>
+        function submitForm(action) {
+            const form = document.querySelector('form');
 
-        // 기존 action 입력 필드가 있는지 확인하고 제거
-        const existingInput = form.querySelector('input[name="action"]');
-        if (existingInput) {
-            existingInput.value = action;  // 기존 입력 필드의 값을 업데이트
-        } else {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'action';
-            input.value = action;
-            form.appendChild(input);
+            // 기존 action 입력 필드 확인 및 제거
+            let existingInput = form.querySelector('input[name="action"]');
+            if (existingInput) {
+                existingInput.value = action;  // 기존 입력 필드의 값을 업데이트
+            } else {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'action';
+                input.value = action;
+                form.appendChild(input);
+            }
+
+            form.action = "/" + action;
+            form.submit();
         }
 
-        form.action = "/" + action;
-        form.submit();
-    }
-
-    window.onload = function() {
-        const userId = parseInt("{{ id }}", 10); // 서버에서 전달된 id 값을 정수로 변환
-        if (userId === 999) {
-            document.getElementById('new-reservation').style.display = 'none'; // 신규 예약 버튼 숨김
-        }
-    };
-</script>
+        window.onload = function() {
+            const userId = parseInt("{{ id }}", 10); // 서버에서 전달된 id 값을 정수로 변환
+            if (userId === 999) {
+                document.getElementById('new-reservation').style.display = 'none'; // 신규 예약 버튼 숨김
+            }
+        };
+    </script>
 </body>
 </html>

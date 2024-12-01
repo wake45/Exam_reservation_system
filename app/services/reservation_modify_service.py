@@ -2,6 +2,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
+from enums.reservation_status import ReservationStatus
 from models.reservations import Reservations
 
 class ReservationModifyService:
@@ -15,6 +16,14 @@ class ReservationModifyService:
         exam_end_date: datetime,
         exam_participants: int, 
     ):
+        
+        # 예약 존재 여부 확인
+        reservation = self.db.query(Reservations).filter(Reservations.id == id).first();
+
+        # 예약이 존재하지 않을 경우
+        if not reservation:
+                return {"error": "예약을 찾을 수 없습니다."}
+
         # 현재 시간 및 3일 후 시간 구하기
         current_time = datetime.now()
         three_days_ago = current_time + timedelta(days=3)
@@ -31,23 +40,30 @@ class ReservationModifyService:
         if exam_participants > 50000:
             return {"error": "응시인원은 5만명 이하로만 가능합니다."}
 
-        #예약 시간대 중복 확인
-        existing_reservation = self.db.query(Reservations).filter(
+        # 같은 시간대의 확정된 예약의 응시 인원 합산
+        overlapping_participants = self.db.query(
+            Reservations.exam_participants
+        ).filter(
             and_(
-                Reservations.reservation_type == 'CONFIRMED', 
-                Reservations.exam_start_date < exam_end_date,
-                Reservations.exam_end_date > exam_start_date
+                Reservations.exam_start_date <= exam_end_date,
+                Reservations.exam_end_date >= exam_start_date,
+                Reservations.reservation_type == ReservationStatus.CONFIRMED
             )
         ).all()
 
-        if existing_reservation:
-            return {"error": "해당 시간대에 이미 확정 된 예약이 존재합니다."}
-        
-        # 예약 존재 여부 확인
-        reservation = self.db.query(Reservations).filter(Reservations.id == id).first();
+        # 총 응시 인원 계산
+        total_participants = sum(reservation.exam_participants for reservation in overlapping_participants)
 
-        if not reservation:
-                return {"error": "예약을 찾을 수 없습니다."}
+        # 확정된 응시 인원이 5만 명 이상인지 확인
+        if total_participants >= 50000:
+            return {"error": "해당 시간대에 확정된 응시 인원이 5만 명을 초과하였습니다."}
+
+        # 수정 예약의 응시 인원도 포함
+        total_participants_add = total_participants + exam_participants
+
+        # 수정 예약 응시 인원을 포함한 응시 인원이 5만 명 초과하는지 확인
+        if total_participants_add > 50000:
+            return {"error": "해당 시간대에는 " + str(50000 - total_participants) + "명으로만 수정 가능합니다."}
         
         # 예약 수정
         try:
@@ -55,9 +71,9 @@ class ReservationModifyService:
             reservation.exam_start_date = exam_start_date
             reservation.exam_end_date = exam_end_date
             reservation.exam_participants = exam_participants
-            reservation.modified_date = datetime.now()
+            reservation.modified_date = datetime.now() # 수정 시간 설정
             
-            self.db.commit()  # 데이터베이스에 커밋하여 변경사항을 저장합니다.
+            self.db.commit()  # 변경사항 저장
 
             return {"message": "예약이 성공적으로 수정되었습니다."}
         except Exception as e:
