@@ -1,0 +1,21 @@
+로컬환경에서 구동하기 위한 세팅
+
+1. https://github.com/wake45/Exam_reservation_system/blob/main/Exam_reservation_system.7z 파일 다운로드
+2. Python 설치 ( https://www.python.org/downloads/ )
+3. PostgreSQL 설치 ( https://www.postgresql.org/download/ )
+4. VSCode 설치 ( https://code.visualstudio.com/download )
+5. VSCode 내 MARKETPLACE에서 Python, PostgreSQL, Pylance 설치
+6. Python 환경변수 설정 ( python 폴더 내 Scripts 폴더 ) - 자동 세팅됐다면 생략
+7. 터미널에 pip install -r requirements.txt
+8. 터미널에 cd app
+9. 터미널에 uvicorn main:app --reload
+10. localhost:8000 으로 접속
+11. 로그인 후 테스트 데이터 만들기 버튼 클릭(첫 1회 실행 필수)
+12. 뒤로가기 버튼과 화면 내 버튼으로 메뉴 이동
+
+<설치된 버전>
+PostgreSQL 17.2
+Python 3.11.9
+pip 24.0
+
+구글 클라우드 압축 파일 경로 또한 올려 놓았습니다.
