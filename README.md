@@ -38,3 +38,8 @@
 ### 디자인 수정
 ### 주석 정리
 ### API 문서 및 설계서 제작
+
+## 12월 16일
+### RestFul 설계원칙 고려 수정
+### Pagenation fastapi-pagination 사용
+### Unit Test unittest 사용
