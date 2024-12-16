@@ -8,7 +8,7 @@ CREATE TABLE Users (
 CREATE TYPE reservation_status AS ENUM ('waiting', 'confirmed', 'canceled');
 
 CREATE TABLE Reservations (
-    reservation_id SERIAL PRIMARY KEY,                            		-- 예약 ID
+    id SERIAL PRIMARY KEY,                            				-- 예약 ID
     reservation_type reservation_status NOT NULL,                		-- 예약 상태 (ENUM 타입 사용)
     exam_name VARCHAR(100) NOT NULL,                             		-- 시험명
     exam_start_date TIMESTAMP NOT NULL,                          		-- 시험 시작 시간
@@ -20,3 +20,6 @@ CREATE TABLE Reservations (
     canceled_date TIMESTAMP,                                     			-- 예약 취소일
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE  -- 외래키 설정
 );
+
+-- 외래 키 인덱스
+CREATE INDEX idx_reservations_user_id ON Reservations (user_id);

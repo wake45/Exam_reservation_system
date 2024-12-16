@@ -241,7 +241,7 @@
 		
 		    $.ajax({
 		        url: '/reservation_modify',
-		        type: 'POST',
+		        type: 'PUT',
 		        data: formData,
 		        processData: false,
 		        contentType: false,
@@ -282,7 +282,7 @@
 		
 		    $.ajax({
 		        url: '/reservation_add',
-		        type: 'POST',
+		        type: 'PATCH',
 		        data: formData,
 		        processData: false,
 		        contentType: false,
@@ -309,7 +309,7 @@
 		
 		    $.ajax({
 		        url: '/reservation_delete',
-		        type: 'POST',
+		        type: 'DELETE',
 		        data: formData,
 		        processData: false,
 		        contentType: false,
@@ -334,7 +334,7 @@
 		
 		    $.ajax({
 		        url: '/reservation_confirm',
-		        type: 'POST',
+		        type: 'PATCH',
 		        data: formData,
 		        processData: false,
 		        contentType: false,
