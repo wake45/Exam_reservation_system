@@ -8,7 +8,7 @@ from database import get_db
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
-@router.get("/test_data") # 테스트 데이터 생성(Users)
+@router.get("/testData") # 테스트 데이터 생성(Users)
 async def test_data(request: Request, db: Session = Depends(get_db)):
     test_data_service = TestDataService(db)
 

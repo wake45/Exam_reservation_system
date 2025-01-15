@@ -11,7 +11,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 # 신규 예약 등록
-@router.post("/reservation_new")
+@router.post("/reservationNew")
 async def reservation(
     user_id: int = Form(...),
     exam_name: str = Form(...),
@@ -47,7 +47,7 @@ async def reservation(
 
 
 # 예약되어있는 리스트 조회(신규예약 페이지로 이동)
-@router.get("/reservation_available") 
+@router.get("/reservationAvailable") 
 async def reservation_new(request: Request, id: int, db: Session = Depends(get_db)):
 
     # 서비스 호출
@@ -58,7 +58,7 @@ async def reservation_new(request: Request, id: int, db: Session = Depends(get_d
 
 
 # 예약 목록 조회 페이지로 이동
-@router.get("/reservation_list") 
+@router.get("/reservationList") 
 async def reservation_list(request: Request, id: int, db: Session = Depends(get_db)):
 
     # 서비스 호출
@@ -69,7 +69,7 @@ async def reservation_list(request: Request, id: int, db: Session = Depends(get_
 
 
 # 예약 내역 수정
-@router.put("/reservation_modify")
+@router.put("/reservationModify")
 async def reservation_modify(
     id: int = Form(...),
     exam_name: str = Form(...),
@@ -104,7 +104,7 @@ async def reservation_modify(
     return result
 
 # 예약 삭제
-@router.delete("/reservation_delete")
+@router.delete("/reservationDelete")
 async def reservation_delete(
     id: int = Form(...),
     db: Session = Depends(get_db)
@@ -117,7 +117,7 @@ async def reservation_delete(
     return result
 
 # 예약 확정
-@router.patch("/reservation_confirm")
+@router.patch("/reservationConfirm")
 async def reservation_confirm(
     id: int = Form(...),
     db: Session = Depends(get_db)
@@ -131,7 +131,7 @@ async def reservation_confirm(
 
 
 # 예약 인원 추가
-@router.patch("/reservation_add") 
+@router.patch("/reservationAdd") 
 async def reservation_add(
     id: int = Form(...),
     add_exam_participants: str = Form(...),

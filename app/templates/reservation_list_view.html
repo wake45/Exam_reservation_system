@@ -240,7 +240,7 @@
 		    formData.append('exam_participants', examParticipants);
 		
 		    $.ajax({
-		        url: '/reservation_modify',
+		        url: '/reservationModify',
 		        type: 'PUT',
 		        data: formData,
 		        processData: false,
@@ -281,7 +281,7 @@
 		    formData.append('add_exam_participants', addExamParticipants);
 		
 		    $.ajax({
-		        url: '/reservation_add',
+		        url: '/reservationAdd',
 		        type: 'PATCH',
 		        data: formData,
 		        processData: false,
@@ -308,7 +308,7 @@
 		    formData.append('id', id);
 		
 		    $.ajax({
-		        url: '/reservation_delete',
+		        url: '/reservationDelete',
 		        type: 'DELETE',
 		        data: formData,
 		        processData: false,
@@ -333,7 +333,7 @@
 		    formData.append('id', id);
 		
 		    $.ajax({
-		        url: '/reservation_confirm',
+		        url: '/reservationConfirm',
 		        type: 'PATCH',
 		        data: formData,
 		        processData: false,
